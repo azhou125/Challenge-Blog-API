@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Welcome to HyperBlog!</title>
+    <meta name="description" content="Blog Posts">
+    <link id="favicon" rel="icon" href="https://hyperdev.com/favicon-app.ico" type="image/x-icon">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/5.0.0/normalize.css">
+    <link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet">
+
+    <link rel="stylesheet" href="/style.css">
+  </head>
+  <body>
+    <div class="container">
+      <header>
+        <h1>All the Blog Posts</h1>
+      </header>
+      <main>
+	  
+        <section>
+          <h2>Blog Posts list</h2>
+          <form id="js-blogPosts-list-form">
+			<div>
+				<label for="blog-title">Blog Title</label>
+				<input type="text" name="blog-title" id="blog-title" placeholder="e.g., Diary of Today">
+			</div>
+			<div>
+				<label for="blog-content">Blog content</label>
+				<input type="text" name="blog-content" id="blog-content" placeholder="e.g., Andy is lazy today.">
+			</div>
+			<div>
+				<label for="blog-author">Blog Author</label>
+				<input type="text" name="blog-author" id="blog-author" placeholder="e.g., Andy">
+			</div>
+			<div>
+				<label for="blog-publish-Date">Blog Publish Date</label>
+				<input type="text" name="blog-publish-Date" id="blog-publish-Date" placeholder="e.g., 2018/7/23">
+			</div>
+            <button type="submit">Add blogPost</button>
+			
+          </form>
+
+          <ul class="blogPosts-list js-blogPosts-list">
+          </ul>
+        </section>
+		
+      </main>
+    </div>
+    <script src="//code.jquery.com/jquery-3.1.1.min.js"
+    integrity="sha256-hVVnYaiADRTO2PzUGmuLJr8BLUSjGIZsDYGmIJLv2b8="
+    crossorigin="anonymous"></script>
+    <script src="/client.js"></script>
+  </body>
+</html>
