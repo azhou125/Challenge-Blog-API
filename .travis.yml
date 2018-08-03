@@ -4,6 +4,6 @@ deploy:
   provider: heroku
   api_key:
     secure: cDK3QzO1hY7heZiVLFkLZ+NOkjLs5Uk7Fmkt/MjBHL7qz+Ry2R5QI4Or75GnzNSaN06LAtbVK6SNWKYtt22g4mJTNaX9VBZyes+76efqMIM83b5UAxHq/MLS3LIpUBExARVcFZVX8JerSWzTPh6AUU1nhSxnszhlObl4OVxmyom9Mx9ZHn9l/pa7q/0cvIV8D24hE9zGAVyvi6FZgtCGNiOoFlhNsUh4AS5J5q1YtkBgmlSq2bDcK+C9QkU/ohVRYj5XNjJJatVJAGY/3NmaeUqRyEyJRJfl65jpvqxV8gibNTjz3YfoDOgIkdekIe20WYODhdmpJpYTbRlA1ejeV8Lq77pjBoY3q7e7qle3c4VrB2id6DCmo8/aqXwTrP4kdW075uAhP/8rhc7sKfk8MUUlihJ29ZkIqU/NvsSIgSXCnQ8niVS5vBa+ZxdAXs2tA0XpMIG49yQZSFbj8VKejv1APGMyIHlWOw1xdDN98NG0lAPLmOoyfZEO5TxuDiwkYx0p9HMK2d/bHsX/WUo0f2SjMzxAiyze+iyFLjE+vxKrb3SQ6jFZI+C/FoFtRA6/I0K/TGLg9N0Wufl3NyGDWiWqXh1vznSmQzn0h4fBUv90KSKY4h4BblTziwrUbfmAZ2Z+suv83HmGZ7y9zuSGAm0HWYMS9ZD+viUVJV0PhQ8=
-  app: Challenge-Blog-API
+  app: sheltered-wave-10886
   on:
     repo: azhou125/Challenge-Blog-API
