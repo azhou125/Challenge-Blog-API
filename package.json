@@ -4,7 +4,8 @@
   "description": "Thinkful Challenge exercise for building a CRUD API for a blogging platform",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node server.js",
+    "test": "mocha --exit"
   },
   "author": "Ang （）\u001b[D\u001b",
   "license": "ISC",
@@ -12,5 +13,22 @@
     "express": "^4.16.3",
     "morgan": "^1.9.0",
     "uuid": "^3.3.2"
-  }
+  },
+  "devDependencies": {
+    "chai": "^4.1.2",
+    "chai-http": "^4.0.0",
+    "mocha": "^5.2.0"
+  },
+  "directories": {
+    "test": "test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/azhou125/Challenge-Blog-API.git"
+  },
+  "keywords": [],
+  "bugs": {
+    "url": "https://github.com/azhou125/Challenge-Blog-API/issues"
+  },
+  "homepage": "https://github.com/azhou125/Challenge-Blog-API#readme"
 }

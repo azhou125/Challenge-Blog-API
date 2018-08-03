@@ -8,7 +8,7 @@ const {BlogPosts} = require('./models');
 
 BlogPosts.create('Today of Andy.','Andy is lazy.','Andy');
 
-BlogPosts.create('Yesterday of Andy.','Andy is slothful.','Andy');
+BlogPosts.create('Yesterday of Andy.','Andy is slothful.','Andy','July 23rd, 2018');
 
 router.get('/',(req,res)=>{
 	res.json(BlogPosts.get());
@@ -25,7 +25,13 @@ router.post('/', jsonParser, (req, res) => {
       return res.status(400).send(message);
     }
   }
-  const item = BlogPosts.create(req.body.title, req.body.content, req.body.author);
+  const item = BlogPosts.create(
+	req.body.title, 
+	req.body.content, 
+	req.body.author, 
+	req.body.publishDate
+  );
+  
   res.status(201).json(item);
 });
 
@@ -59,9 +65,10 @@ router.put('/:id', jsonParser, (req, res) => {
     id: req.params.id,
     title: req.body.title,
     content: req.body.content,
-	author: req.body.author
+	author: req.body.author,
+	publishDate: req.body.publishDate
   });
-  res.status(204).end();
+  res.status(200).json(updatedItem);
 })
 
 module.exports = router;
