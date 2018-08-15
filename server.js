@@ -8,7 +8,7 @@ const morgan = require('morgan'); // for test
 mongoose.Promise = global.Promise;
 
 const { PORT, DATABASE_URL } = require("./config");
-const { Blog } = require("./models");
+const { Author, BlogPost } = require("./models");
 
 const app = express();
 app.use(express.json());
@@ -22,7 +22,6 @@ app.get("/", (req, res) => {
   res.sendFile(__dirname + '/views/index.html');
 });
 
-//--app.use('/blog-posts', blogPostsRouter);
 
 // GET requests to /blog-posts => return 10 blogs
 app.get("/blog-posts", (req, res) => {
@@ -33,10 +32,10 @@ app.get("/blog-posts", (req, res) => {
             filters[field] = req.query[field];
         }
     });
-    Blog
-        .find(filters).limit(10)
+    BlogPost
+        .find(filters).populate('author')
         .then(Blogs => res.json(
-            Blogs.map(blog => blog.serializeWithoutID())
+            Blogs.map(blog => blog.serialize())
         ))
         .catch(err => {
             console.error(err);
@@ -46,11 +45,11 @@ app.get("/blog-posts", (req, res) => {
 
 // can also request by ID
 app.get("/blog-posts/:id", (req, res) => {
-  Blog
+  BlogPost
     // this is a convenience method Mongoose provides for searching
     // by the object _id property
-    .findById(req.params.id)
-    .then(blog => res.json(blog.serializeWithID()))
+    .findById(req.params.id).populate('author')
+    .then(blog => res.json(blog.serializeWithComments()))
     .catch(err => {
       console.error(err);
       res.status(500).json({ message: "Internal server error" });
@@ -58,7 +57,7 @@ app.get("/blog-posts/:id", (req, res) => {
 });
 
 app.post("/blog-posts", (req, res) => {
-  const requiredFields = ['title', 'content','author'];
+  const requiredFields = ['title', 'content','author_id'];
   for (let i = 0; i < requiredFields.length; i++) {
     const field = requiredFields[i];
     if (!(field in req.body)) {
@@ -67,18 +66,29 @@ app.post("/blog-posts", (req, res) => {
       return res.status(400).send(message);
     }
   }
-
-  Blog.create({
-    title: req.body.title,
-    content: req.body.content,
-    author: req.body.author,
-    publishDate: req.body.publishDate || Date.now()
+  Author.findById(req.body.author_id)
+	.then(author=>{
+		if(!author){
+			const message = `Wrong author_id in the request body`;
+			console.error(message);
+			return res.status(400).send(message);  
+		}
+	})
+  
+  BlogPost.create({
+	title: req.body.title,
+	content: req.body.content,
+	author: req.body.author_id,
+	publishDate: req.body.publishDate || new Date()
   })
-    .then(blog => res.status(201).json(blog.serializeOrigin()))
-    .catch(err => {
-      console.error(err);
-      res.status(500).json({ message: "Internal server error" });
-    });
+	.then(newBlog => 
+		BlogPost.findById(newBlog._id).populate('author'))
+	.then(blog => {
+		res.status(201).json(blog.serializeWithComments());})
+	.catch(err => {
+		console.error(err);
+		res.status(500).json({ message: "Internal server error" });
+	});	
 });
 
 app.put("/blog-posts/:id", (req, res) => {
@@ -95,7 +105,7 @@ app.put("/blog-posts/:id", (req, res) => {
   // if the user sent over any of the updatableFields, we udpate those values
   // in document
   const toUpdate = {};
-  const updateableFields = ["title", "content", "author"];
+  const updateableFields = ["title", "content"];
 
   updateableFields.forEach(field => {
     if (field in req.body) {
@@ -103,18 +113,98 @@ app.put("/blog-posts/:id", (req, res) => {
     }
   });
 
-  Blog
+  BlogPost
     // all key/value pairs in toUpdate will be updated -- that's what `$set` does
-    .findByIdAndUpdate(req.params.id, { $set: toUpdate })
-    .then(blog => res.status(200).json(blog.serializeUpdate()))
+    .findByIdAndUpdate(req.params.id, { $set: toUpdate },{new:true}).populate('author')
+    .then(blog => res.status(200).json(blog.serialize()))
     .catch(err => res.status(500).json({ message: "Internal server error" }));
 });
 
 app.delete("/blog-posts/:id", (req, res) => {
-  Blog.findByIdAndRemove(req.params.id)
+  BlogPost.findByIdAndRemove(req.params.id)
     .then(blog => res.status(204).end())
     .catch(err => res.status(500).json({ message: "Internal server error" }));
 });
+
+app.post("/authors", (req, res) => {
+  if(req.body.userName){
+	  Author.findOne({userName: req.body.userName})
+		.then(author=>{
+				if(author){
+					const message = `userName already exists`;
+					console.error(message);
+					return res.status(400).json({ message: message });
+				}
+			}
+		)
+  }
+
+  Author.create({
+	firstName: req.body.firstName,
+	lastName: req.body.lastName,
+	userName: req.body.userName
+  })
+	.then(author => res.status(201).json(author.serialize()))
+	.catch(err => res.status(500).json({ message: "Internal server error" }));
+});
+
+app.put("/authors/:id", (req, res) => {
+  if (!(req.params.id && req.body.id && req.params.id === req.body.id)) {
+    const message =
+      `Request path id (${req.params.id}) and request body id ` +
+      `(${req.body.id}) must match`;
+    console.error(message);
+    return res.status(400).json({ message: message });
+  }
+  
+  if(req.body.userName){
+	Author.findOne({userName: req.body.userName})
+		.then(author => {
+			if(author){
+				const message = `userName already exists`;
+				console.error(message);
+				//console.error(Author.findOne({userName: req.body.userName}));
+				return res.status(400).json({ message: message });
+			}
+		})
+  }
+  
+  //if(req.body.userName && Author.findOne({userName: req.body.userName})){
+	//const message = `userName already exists`;
+    //console.error(message);
+	//console.error(Author.findOne({userName: req.body.userName}));
+    //return res.status(400).json({ message: message });
+  //}
+  
+  const toUpdate = {};
+  const updateableFields = ["firstName", "lastName", "userName"];
+  updateableFields.forEach(field => {
+    if (field in req.body) {
+      toUpdate[field] = req.body[field];
+    }
+  });
+
+  Author
+    // all key/value pairs in toUpdate will be updated -- that's what `$set` does
+    .findByIdAndUpdate(req.params.id, { $set: toUpdate }, {new:true})
+    .then(author => res.status(200).json(author.serialize()))
+    .catch(err => res.status(500).json({ message: "Internal server error" }));
+});
+
+app.delete("/authors/:id", (req, res) => {
+  Author.findByIdAndRemove(req.params.id)
+    .then(blog => res.status(204).end())
+    .catch(err => res.status(500).json({ message: "Internal server error" }));
+});
+
+
+app.use(function(err,req,res,next){
+	if(res.headersSent){
+		return next(err);
+	}
+	return res.status(500).json({ message: "Internal server error" })
+})
+
 
 // catch-all endpoint if client makes request to non-existent endpoint
 app.use("*", function(req, res) {
